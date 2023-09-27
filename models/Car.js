@@ -1,16 +1,15 @@
 const db = require('../config/db');
 
 class Car {
-    constructor(idusers, name, state_number, car_type) {
-        this.idusers = idusers;
+    constructor(name, state_number, car_type) {
         this.name = name;
         this.state_number = state_number;
         this.car_type = car_type;
     }
 
-    async save() {
+    async save(id) {
         const sql = "INSERT INTO `parking-app`.cars (idusers, name, state_number, car_type) VALUES (?, ?, ?, ?)";
-        const [newCar] = await db.execute(sql, [this.idusers, this.name, this.state_number, this.car_type]);
+        const [newCar] = await db.execute(sql, [id, this.name, this.state_number, this.car_type]);
         return newCar;
     }
 

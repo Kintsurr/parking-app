@@ -14,9 +14,11 @@ exports.signup = async (req, res, next) =>{
         res.status(201).json({
             success: true,
             message: 'User created successfully!',
+            data: user,
             token: token,
             location: `/users/${id}`,
-            data: user,
+            
+    
         });
     } catch (error) {
         

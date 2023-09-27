@@ -3,10 +3,19 @@ const Car = require('../models/Car');
 // Create a new car
 exports.createCar = async (req, res) => {
     try {
-        let { idusers, name, state_number, car_type } = req.body;
-        let car = new Car(idusers, name, state_number, car_type);
-         car = await car.save();
+        const idusers = req.userId;
+        
+        let {name, state_number, car_type } = req.body;
+        if(!idusers) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is missing in the request URL."
+            });
+        }
+        let car = new Car(name, state_number, car_type);
+         car = await car.save(idusers);
 
+         
          res.status(200).json({
             success: true,
             data: car,
@@ -16,7 +25,7 @@ exports.createCar = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error creating car.',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -65,8 +74,15 @@ exports.getCarById = async (req, res) => {
 exports.updateCar = async (req, res) => {
     try {
         const carID = req.params.id;
+    
         const { name, state_number, car_type } = req.body;
         const [car,_] =await Car.update(carID, name, state_number, car_type);
+        if(!car){
+            res.status(401).json({
+                success: False,
+                message: "This use isn't allowed to change the car"
+            });
+        }
         
         res.status(200).json({
             success: true,

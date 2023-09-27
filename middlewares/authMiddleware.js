@@ -4,7 +4,7 @@ function generateToken(id) {
     const payload = {
         userId: id
     };
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 }
 
 function verifyToken(req, res, next) {
