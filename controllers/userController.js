@@ -1,8 +1,8 @@
 // controllers/userController.js
-
+const generateToken = require('../middlewares/authMiddleware')
 const User = require('../models/User'); 
 
-exports.createUser = async (req, res, next) => {
+/*exports.createUser = async (req, res, next) => {
     try {
         let { name, email, password } = req.body;
         let user = new User(name, email, password);  
@@ -23,7 +23,7 @@ exports.createUser = async (req, res, next) => {
         });
        
     }
-};
+}; */
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -73,11 +73,13 @@ exports.updateUser = async (req, res) => {
         const { name, email, password } = req.body;
         const [user, _] = await User.update(userId, name, email, password);
         
-
+        const token = generateToken.generateToken(userId);
         res.status(200).json({
             success: true,
+            message: 'User updated successfully!',
+            token: token,
             data: user,
-            message: 'User updated successfully!'
+            
         });
     } catch (error) {
         res.status(500).json({

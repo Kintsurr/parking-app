@@ -1,18 +1,24 @@
 require("dotenv").config(); // ALLOWS ENVIRONMENT VARIABLES TO BE SET ON PROCESS.ENV SHOULD BE AT TOP
+
+const verifyToken = require('./middlewares/authMiddleware');
+const express = require("express");
+const app = express();
+
+
 const userRoutes = require('./routes/userRoutes');
 const carRoutes = require('./routes/carRoutes');
 const parkingHistoryRoutes = require('./routes/parkingHistoryRoutes');
 const parkingZoneRoutes = require('./routes/parkingZoneRoutes');
-const express = require("express");
-const app = express();
+
 
 // Middleware
 app.use(express.json()); // parse json bodies in the request object
 
 // Redirect requests to endpoint starting with /posts to postRoutes.js
+app.use("/", require('./routes/authRoute'))
 app.use("/posts", require("./routes/postRoutes"))
 
-app.use('/users', userRoutes);
+app.use('/users',verifyToken.verifyToken, userRoutes);
 app.use('/cars', carRoutes);
 app.use('/parking-history', parkingHistoryRoutes);
 app.use('/parking-zones', parkingZoneRoutes);

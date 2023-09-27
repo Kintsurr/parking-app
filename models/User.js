@@ -1,5 +1,5 @@
 const db = require('../config/db');
-
+const bcrypt = require('bcryptjs');
 class User {
     constructor(name, email, password) {
         this.name = name;
@@ -8,10 +8,14 @@ class User {
     }
 
     async save() {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+
         const sql = "INSERT INTO `parking-app`.users (name, email, password) VALUES (?,?,?);"  ;
         const [newUser, _] = await db.execute(sql,[this.name, this.email, this.password]);
-
-        return newUser;
+        
+        const id = newUser.insertId
+        return [this, id];
     }
 
     static findAll() {
@@ -26,6 +30,8 @@ class User {
     }
 
    static async update(id, name, email, password) {
+        const salt = await bcrypt.genSalt(10);
+        password = await bcrypt.hash(password, salt);
         const sql = "UPDATE `parking-app`.users SET name = ?, email = ?, password = ? WHERE idusers = ?";
         return  await db.execute(sql, [name, email, password, id]);
     }
