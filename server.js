@@ -4,8 +4,8 @@ require("dotenv").config(); // ALLOWS ENVIRONMENT VARIABLES TO BE SET ON PROCESS
 const express = require("express");
 const userRoutes = require('./routes/userRoutes');
 
-const parkingHistoryRoutes = require('./routes/parkingHistoryRoutes');
-const parkingZoneRoutes = require('./routes/parkingZoneRoutes');
+
+
 
 const app = express();
 
@@ -16,11 +16,10 @@ app.use(express.json()); // parse json bodies in the request object
 // Redirect requests to endpoint starting with /posts to postRoutes.js
 app.use("/", require('./routes/authRoute'))
 app.use("/posts", require("./routes/postRoutes"))
-
 app.use('/users',verifyToken.verifyToken, userRoutes);
 
-app.use('/parking-history', parkingHistoryRoutes);
-app.use('/parking-zones', parkingZoneRoutes);
+
+
 // Global Error Handler. IMPORTANT function params MUST start with err
 app.use((err, req, res, next) => {
   console.log(err.stack);

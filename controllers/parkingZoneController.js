@@ -5,7 +5,7 @@ exports.createZone = async (req, res) => {
         let { name, address, hourly_rate } = req.body;
         let zone = new ParkingZone(name, address, hourly_rate);
         zone = await zone.save();
-
+        
         res.status(200).json({
             success: true,
             data: zone,

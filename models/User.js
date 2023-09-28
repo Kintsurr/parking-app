@@ -12,7 +12,7 @@ class User {
         this.password = await bcrypt.hash(this.password, salt);
 
         const sql = "INSERT INTO `parking-app`.users (name, email, password) VALUES (?,?,?);"  ;
-        const [newUser, _] = await db.execute(sql,[this.name, this.email, this.password]);
+        const [newUser, _] = await db.execute(sql,[this.name, this.email, this.password,]);
         
         const id = newUser.insertId
         return [this, id];

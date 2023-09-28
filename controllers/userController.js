@@ -2,28 +2,6 @@
 const generateToken = require('../middlewares/authMiddleware')
 const User = require('../models/User'); 
 
-/*exports.createUser = async (req, res, next) => {
-    try {
-        let { name, email, password } = req.body;
-        let user = new User(name, email, password);  
-        user = await user.save();
-        
-
-        res.status(201).json({
-            success: true,
-            data: user,
-            message: 'User created successfully!'
-        });
-    } catch (error) {
-        
-        res.status(500).json({
-            success: false,
-            message: 'Error creating user.',
-            error: error.message
-        });
-       
-    }
-}; */
 
 exports.getAllUsers = async (req, res) => {
     try {

@@ -46,7 +46,9 @@ exports.logIn =async (req, res, next) =>{
         }
 
         // Compare hashed password with provided password
-        const passwordIsValid = bcrypt.compare(password, user.password);
+       
+        const passwordIsValid =await bcrypt.compare('password', user.password);
+        
         if (!passwordIsValid) {
             return res.status(400).json({
                 success: false,
