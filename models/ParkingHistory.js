@@ -12,9 +12,13 @@ class ParkingHistory {
         
         return db.execute(sql);
     }
-
+    static findByCarAndZone(carID, zoneID) {
+        const sql = "SELECT * FROM `parking-app`.parkinghistory WHERE carID = ? AND zoneID = ? AND endTime IS NULL";
+        return db.execute(sql, [carID, zoneID]);
+    }
     static findById(recordId) {
-        const sql = "SELECT * FROM `parking-app`.parkinghistory WHERE historyID = ?";
+        
+        const sql = "SELECT * FROM `parking-app`.parkinghistory WHERE carID = ?";
         return db.execute(sql, [recordId]);
     }
 
@@ -23,7 +27,15 @@ class ParkingHistory {
         
         return db.execute(sql, [zoneID]);
     }
-
+    static getParkingZoneHourlyRate(zoneID){
+        const sql = "SELECT hourly_rate FROM `parking-app`.parkingzones WHERE zoneID = ?";
+        return db.execute(sql, [zoneID]);
+    }
+    static deductCostFromBalance(userID, cost) {
+        
+        const sql = "UPDATE `parking-app`.users SET virtual_balance = virtual_balance - ? WHERE idusers = ?";
+        return db.execute(sql, [cost, userID]);
+    }
     static async update(recordId, carID, zoneID, startTime, endTime, cost) {
         const sql = "UPDATE `parking-app`.parkinghistory SET carID = ?, zoneID = ?, startTime = ?, endTime = ?, totalCost = ? WHERE historyID = ?";
         

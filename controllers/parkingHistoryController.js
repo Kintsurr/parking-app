@@ -1,10 +1,17 @@
 const ParkingHistory = require('../models/ParkingHistory');
-
+const db = require('../config/db');
 exports.createEntry = async (req, res) => {
     try {
-        let { carID, zoneID, startTime, endTime, totalCost } = req.body;
-        let entry =await ParkingHistory.create(carID, zoneID, startTime, endTime, totalCost);
-        
+        let { carID, zoneID} = req.body;
+        let startTime = new Date();
+        let entry =await ParkingHistory.create(carID, zoneID, startTime, null, null);
+        let idusers = req.userId;
+        const query = 'SELECT * FROM `parking-app`.cars WHERE carID = ? AND idusers = ?';
+        const [rows] = await db.execute(query, [carID, idusers]);
+
+            if (rows.length === 0) {
+                return res.status(403).json({ error: 'Access denied' });
+            }
         res.status(200).json({
             success: true,
             data: entry,
@@ -18,7 +25,51 @@ exports.createEntry = async (req, res) => {
         });
     }
 };
+exports.endEntry = async (req, res) => {
+    try {
+        let { carID, zoneID } = req.body;
+        let idusers = req.userId;
+        let endTime = new Date();
+        const query = 'SELECT * FROM `parking-app`.cars WHERE carID = ? AND idusers = ?';
+        const [rows] = await db.execute(query, [carID, idusers]);
 
+        if (rows.length === 0) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+        
+        const [existingEntry, _] = await ParkingHistory.findByCarAndZone(carID, zoneID);
+        
+        if (!existingEntry || !existingEntry.length) {
+            return res.status(404).json({
+                success: false,
+                message: 'Parking entry not found.'
+            });
+        }
+        
+        // Fetch the hourly rate from parkingZone table
+        const [hourlyRate,] = await ParkingHistory.getParkingZoneHourlyRate(zoneID);  
+
+    
+        let duration = (endTime - existingEntry[0].startTime) / (1000 * 60 * 60);  // in hours
+        let totalCost = duration * hourlyRate[0].hourly_rate;
+
+        await ParkingHistory.deductCostFromBalance(idusers ,totalCost);
+        // Update parking history entry
+        await ParkingHistory.update(existingEntry[0].historyID, carID, zoneID, existingEntry[0].startTime, endTime, totalCost);
+        
+        res.status(200).json({
+            success: true,
+            data: { endTime, totalCost },
+            message: 'Parking ended successfully!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error ending parking.',
+            error: error.message
+        });
+    }
+};
 exports.getAllEntries = async (req, res) => {
     try {
         const [entries,_] = await ParkingHistory.findAll();
@@ -35,10 +86,11 @@ exports.getAllEntries = async (req, res) => {
     }
 };
 
-exports.getEntryById = async (req, res) => {
+exports.getEntryByCarId = async (req, res) => {
     try {
-        const entryId = req.params.id;
-        const [entry,_] = await ParkingHistory.findById(entryId);
+        const entryId = req.body;
+        
+        const [entry,_] = await ParkingHistory.findById(entryId.carID);
         if (!entry) {
             return res.status(404).json({ 
                 success: false,

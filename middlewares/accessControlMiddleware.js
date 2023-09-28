@@ -5,8 +5,9 @@ const accessControlMiddleware = async (req, res, next) => {
   const idusers = req.userId;   // Extract car ID from the URL
 
   // Query the database to check if the user owns the car
-  const query = 'SELECT * FROM `parking-app`.cars WHERE carID = ? AND idusers = ?';
+  
   try {
+    const query = 'SELECT * FROM `parking-app`.cars WHERE carID = ? AND idusers = ?';
     const [rows] = await db.execute(query, [carID, idusers]);
 
     // If the query returns no rows, the user doesn't own the car

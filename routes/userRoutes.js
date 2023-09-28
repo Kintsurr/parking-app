@@ -18,7 +18,7 @@ router.route('/:id').get( userController.getUserById);
 router.route('/:id/update').put( userController.updateUser);
 router.route('/:id/delete').delete( userController.deleteUser);
 router.use('/:id/cars', carRoutes)
-router.use(':id/parking-history', parkingHistoryRoutes);
+router.use('/:id/parking-history', parkingHistoryRoutes);
 router.use('/:id/parking-zones', checkAdmin, parkingZoneRoutes);
 router.route('/:id/getAll').get(checkAdmin, userController.getAllUsers);
 
